@@ -4,11 +4,11 @@ var io = require('socket.io')(http);
 var path = require('path');
 var express = require('express');
 
-var server_port = 8080;
-var server_ip_address = '127.0.0.1';
+var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
 // Create list
-var groceries = [];
+var groceries = ["Milk", "Eggs", "Bread"];
 
 // Build server
 
@@ -39,12 +39,12 @@ io.on('connection', function(socket){
 		var index = groceries.indexOf(grocery);
 		if (index != -1) {
 			groceries.splice(index, 1);
+			io.emit('remove', grocery, index);
 		}
-		io.emit('remove', grocery, index);
 	});
 });
 
 // Start server
-http.listen(server_port, function(){
-	console.log( "Listening on port " + server_port )
+http.listen(server_port, server_ip_address, function(){
+	console.log( "Listening on " + server_ip_address + ", port " + server_port )
 });
